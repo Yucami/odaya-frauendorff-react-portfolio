@@ -13,8 +13,8 @@ export default class PortfolioManager extends Component {
             portfolioToEdit: {}
         };
         
-        this.handleSuccessfulFormSubmission = this.handleSuccessfulFormSubmission.bind(this);
-        // this.handleEditFormSubmission = this.handleEditFormSubmission.bind(this);
+        this.handleNewFormSubmission = this.handleNewFormSubmission.bind(this);
+        this.handleEditFormSubmission = this.handleEditFormSubmission.bind(this);
         this.handleFormSubmissionError = this.handleFormSubmissionError.bind(this);
         this.handleDeleteClick = this.handleDeleteClick.bind(this);
         this.handleEditClick = this.handleEditClick.bind(this);
@@ -37,24 +37,26 @@ export default class PortfolioManager extends Component {
         axios.delete(
             `https://api.devcamp.space/portfolio/portfolio_items/${portfolioItem.id}`,
             { withCredentials: true }
-        ).then(response => {
+        )
+        .then(response => {
             this.setState({
                 portfolioItems: this.state.portfolioItems.filter(item => {
                     return item.id !== portfolioItem.id;
                 })
             });
 
-            return response.data
-        }).catch(error => {
+            return response.data;
+        })
+        .catch(error => {
             console.log("handleDeleteClick error", error);
         }); 
     }
 
-    // handleEditFormSubmission() {
-    //     this.getPortfolioItems();
-    // }
+    handleEditFormSubmission() {
+        this.getPortfolioItems();
+    }
 
-    handleSuccessfulFormSubmission(portfolioItem) {
+    handleNewFormSubmission(portfolioItem) {
         this.setState({
             portfolioItems: [portfolioItem].concat(this.state.portfolioItems)
         });
@@ -66,16 +68,20 @@ export default class PortfolioManager extends Component {
 
     getPortfolioItems() {
         axios
-            .get("https://odayafrauendorff.devcamp.space/portfolio/portfolio_items?order_by=created_at&direction=desc", { 
-                withCredentials: true 
-            }).then(response => {
+            .get(
+                "https://odayafrauendorff.devcamp.space/portfolio/portfolio_items?order_by=created_at&direction=desc", 
+                { 
+                    withCredentials: true 
+                }
+            )
+            .then(response => {
                 this.setState({
                     portfolioItems: [...response.data.portfolio_items]
                 });
-                console.log("response from get portfolio items", response);
-            }).catch(error => {
-                console.log("error in getPortfolioItems", error);
             })
+            .catch(error => {
+                console.log("error in getPortfolioItems", error);
+            });
     }
 
     componentDidMount() {
@@ -87,8 +93,8 @@ export default class PortfolioManager extends Component {
             <div className="portfolio-manager-wrapper">
                 <div className="left-column">
                     <PortfolioForm 
-                        handleSuccessfulFormSubmission={this.handleSuccessfulFormSubmission}
-                        // handleEditFormSubmission={this.handleEditFormSubmission}
+                        handleNewFormSubmission={this.handleNewFormSubmission}
+                        handleEditFormSubmission={this.handleEditFormSubmission}
                         handleFormSubmissionError={this.handleFormSubmissionError}
                         clearPortfolioToEdit={this.clearPortfolioToEdit}
                         portfolioToEdit={this.state.portfolioToEdit}

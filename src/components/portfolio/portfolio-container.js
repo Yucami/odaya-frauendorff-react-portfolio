@@ -26,17 +26,15 @@ export default class PortfolioContainer extends Component {
 
     getPortfolioItems() {
         axios
-          .get("https://odayafrauendorff.devcamp.space/portfolio/portfolio_items")
-          .then(response => {
-            this.setState({
-                data: response.data.portfolio_items
+            .get("https://odayafrauendorff.devcamp.space/portfolio/portfolio_items")
+            .then(response => {
+                this.setState({
+                    data: response.data.portfolio_items
+                });
             })
-          })
-          .catch(error => {
-            console.log(error);
-          })
-          .then(() => {
-          });
+            .catch(error => {
+                console.log(error);
+            });
     }
 
     portfolioItems() {

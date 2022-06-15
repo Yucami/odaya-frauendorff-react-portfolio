@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import axios from "axios";
 import DropzoneComponent from 'react-dropzone-component';
 
-import "../../../node_modules/dropzone/dist/min/dropzone.min.css";
 import "../../../node_modules/react-dropzone-component/styles/filepicker.css";
+import "../../../node_modules/dropzone/dist/min/dropzone.min.css";
 
 export default class PortfolioForm extends Component {
     constructor(props) {
@@ -59,12 +59,12 @@ export default class PortfolioForm extends Component {
                 category: category || "eCommerce",
                 position: position || "",
                 url: url || "",
-                editMode: true,
-                apiUrl: `https://odayafrauendorff.devcamp.space/portfolio/portfolio_items/${id}`,
-                apiAction: "patch",
                 // thumb_image: thumb_image_url || "",
                 // banner_image: banner_image_url || "",
-                // logo: logo_url || ""
+                // logo: logo_url || "",
+                editMode: true,
+                apiUrl: `https://odayafrauendorff.devcamp.space/portfolio/portfolio_items/${id}`,
+                apiAction: "patch"
             });
         }
     }
@@ -92,14 +92,14 @@ export default class PortfolioForm extends Component {
             iconFiletypes: [".jpg", ".png"],
             showFiletypeIcon: true,
             postUrl: "https://httpbin.org/post"
-        }
+        };
     }
 
     djsConfig() {
         return {
             addRemoveLinks: true,
             maxFiles: 1
-        }
+        };
     }
 
     buildForm() {
@@ -139,30 +139,34 @@ export default class PortfolioForm extends Component {
             data: this.buildForm(),
             withCredentials: true
         })
-        .then(response => {
-            this.props.handleSuccessfulFormSubmission(response.data.portfolio_item);
+            .then(response => {
+                if (this.state.editMode) {
+                    this.props.handleEditFormSubmission();
+                } else {
+                    this.props.handleNewFormSubmission(response.data.portfolio_item);
+                }
 
-            this.setState({
-                name: "",
-                description: "",
-                category: "eCommerce",
-                position: "",
-                url: "",
-                thumb_image: "",
-                banner_image: "",
-                logo: "",
-                // editMode: false,
-                // apiUrl: "https://odayafrauendorff.devcamp.space/portfolio/portfolio_items",
-                // apiAction: "post"
-            });
+                this.setState({
+                    name: "",
+                    description: "",
+                    category: "eCommerce",
+                    position: "",
+                    url: "",
+                    thumb_image: "",
+                    banner_image: "",
+                    logo: "",
+                    editMode: false,
+                    apiUrl: "https://odayafrauendorff.devcamp.space/portfolio/portfolio_items",
+                    apiAction: "post"
+                });
 
-            [this.thumbRef, this.bannerRef, this.logoRef].forEach(ref => {
-                ref.current.dropzone.removeAllFiles();
+                [this.thumbRef, this.bannerRef, this.logoRef].forEach(ref => {
+                    ref.current.dropzone.removeAllFiles();
+                });
+            })
+            .catch(error => {
+                console.log("portfolio form handleSubmit error", error);
             });
-        })
-        .catch(error => {
-            console.log("portfolio form handleSubmit error", error);
-        });
 
         event.preventDefault();
     }
@@ -220,14 +224,18 @@ export default class PortfolioForm extends Component {
                 </div>
 
                 <div className="image-uploaders">
-                    <DropzoneComponent
-                        ref={this.thumbRef}
-                        config={this.componentConfig()}
-                        djsConfig={this.djsConfig()}
-                        eventHandlers={this.handleThumbDrop()}
-                    >
-                        <div className="dz-message">Thumbnail</div>
-                    </DropzoneComponent>
+                    {this.state.thumb_image && this.state.editMode ? (
+                        <img src={this.state.thumb_image} />
+                    ) : (
+                        <DropzoneComponent
+                            ref={this.thumbRef}
+                            config={this.componentConfig()}
+                            djsConfig={this.djsConfig()}
+                            eventHandlers={this.handleThumbDrop()}
+                        >
+                            <div className="dz-message">Thumbnail</div>
+                        </DropzoneComponent>
+                    )}
 
                     <DropzoneComponent
                         ref={this.bannerRef}
